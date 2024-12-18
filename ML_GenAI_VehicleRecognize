@@ -1,0 +1,41 @@
+import google.generativeai as genai
+from IPython.display import Markdown
+import math
+from matplotlib import pyplot as plt
+import base64
+import PIL.Image
+import json
+!pip install -q -U google-generativeai
+
+
+# Retrieve an image
+image_path = "/content/IMG_4557.JPG" # Replace with your image path
+image = PIL.Image.open(image_path)
+
+# Choose a Gemini model
+model = genai.GenerativeModel(model_name="gemini-1.5-pro")
+
+#Image appearance
+plt.subplot(1,3,1)
+plt.imshow(image, interpolation='nearest')
+
+prompt = """Identify 1 main the vehicles in the image and provide the following information in JSON format:
+  {
+    "vehicle_id": 1,
+    "color": "color of the vehicle",
+    "license_plate": "license plate number",
+    "vehicle_type": "type of vehicle (e.g., car, truck, motorcycle)",
+    "vehicle_make_and_model": "make and model of the vehicle (e.g., Toyota Camry)"
+  }
+"""
+
+response = model.generate_content([image,  prompt])
+#print(response.text)
+Markdown(">" + response.text)
+vehicle_data =  response.text
+# Menyimpan data ke file JSON
+with open("data.json", "w") as file:
+    json.dump(vehicle_data, file, indent=4)
+
+print("File JSON berhasil dibuat!")
+Markdown(">" + response.text)
